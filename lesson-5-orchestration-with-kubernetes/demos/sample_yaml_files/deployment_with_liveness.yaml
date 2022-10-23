@@ -5,7 +5,7 @@ metadata:
   labels:
     app: my-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: my-app
@@ -16,12 +16,18 @@ spec:
     spec:
       containers:
       - name: simple-node
-        image: YOUR_DOCKER_HUB/simple-node
+        image: omarzztelcocloud/simple-node
         ports:
-        - containerPort: 80
-      livenessProbe:
-        httpGet:
-          path: /health
-          port: 8080
-        initialDelaySeconds: 3
-        periodSeconds: 3
+        - containerPort: 8080
+        args:
+        - /bin/sh
+        - -c
+        - touch /health; echo "hello there" >> /health; sleep 500; rm -f /health; sleep 600
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /health
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 10
